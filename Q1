@@ -1,0 +1,64 @@
+create table secao (
+id serial primary key,
+nome varchar(150) not null,
+ativa boolean not null
+);
+
+
+create table autor (
+id serial primary key,
+nome varchar(150) not null,
+email varchar(150) unique not null,
+senha varchar(50) not null
+);
+
+
+create table noticia (
+id serial primary key,
+titulo varchar(150) not null,
+descricao varchar(100) not null,
+data_postagem date not null,
+id_autor int not null,
+id_secao int not null,
+foreign key (id_autor) references autor(id),
+foreign key (id_secao) references secao(id)
+);
+
+
+insert into secao (nome, ativa) values
+('Culinária', true),
+('Moda',true),
+('Esporte', true);
+
+
+insert into  autor (nome, email, senha) values
+('Carlos', 'carlos@gmail.com', '123'),
+('Maria', 'maria@gmail.com', '124'),
+('João', 'joao@gmail.com', '134');
+
+
+insert into noticia (titulo, descricao, data_postagem, id_secao, id_autor) values
+('Fazendo Pão', 'Descrição 1', '2018-09-17', 1, 1),
+('Limpando o Rosto', 'Descrição 2', '2017-10-20', 2, 2),
+('X vence partida', 'Descrição 3', '2020-05-14', 1, 2),
+('Pavê de Limão', 'Descrição 4', '2015-11-28', 1,2),
+('Acabando Espinhas', 'Descrição 5', '2009-04-22', 2, 2);
+
+
+
+create user admin with password '1';
+grant all privileges on database postgres to admin;
+
+create user revisor with password '123456';
+
+grant select, update on noticia to revisor;
+
+create view noticias as select
+n.titulo,
+n.descricao,
+n.data_postagem,
+s.nome as secao,
+a.nome as autor
+from noticia n
+join secao s on n.id_secao = s.id
+join autor a on n.id_autor = a.id;
